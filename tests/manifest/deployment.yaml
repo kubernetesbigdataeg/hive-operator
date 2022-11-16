@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hive-metastore-svc
+  namespace: hive
+spec:
+  type: ClusterIP
+  ports:
+  - name: thrift
+    port: 9083
+    targetPort: 9083
+    protocol: TCP
+  selector:
+    app: hive
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hive-metastore
+  namespace: hive
+spec:
+  selector:
+    matchLabels:
+      app: hive
+  template:
+    metadata:
+      labels:
+        app: hive
+    spec:
+      containers:
+        - name: hive-metastore
+          image: kubernetesbigdataeg/hive-metastore:3.0.0-1
+          imagePullPolicy: Always
+          command: ["/opt/hive-metastore/bin/entrypoint.sh"]
+          env:
+          - name: HIVE_DB_EXTERNAL
+            value: "true"
+          - name: HIVE_DB_NAME
+            value: "metastore"
+          ports:
+          - name: tcp
+            containerPort: 9083
+            protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 9083
+          readinessProbe:
+            tcpSocket:
+              port: 9083
+          resources:
+            requests:
+              memory: "2G"
+              cpu: 2        
+          volumeMounts:
+          - name: hive-conf-templates
+            mountPath: opt/hive-metastore/conf/templates
+      volumes:
+        - name: hive-conf-templates
+          configMap:
+            name: hive-conf-templates
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hive-conf-templates
+  namespace: hive
+  labels:
+    app: hive
+data:
+  metastore-site.xml.tpl: |
+    <configuration>
+      <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:postgresql://postgresql-svc.hive.svc.cluster.local:5432/metastore</value>
+      </property>
+      <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>org.postgresql.Driver</value>
+      </property>
+      <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>postgres</value>
+      </property>
+      <property>
+        <name> javax.jdo.option.ConnectionPassword</name>
+        <value>postgres</value>
+      </property>
+      <property>
+        <name>metastore.expression.proxy</name>
+        <value>org.apache.hadoop.hive.metastore.DefaultPartitionExpressionProxy</value>
+      </property>
+      <property>
+        <name>metastore.task.threads.always</name>
+        <value>org.apache.hadoop.hive.metastore.events.EventCleanerTask,org.apache.hadoop.hive.metastore.MaterializationsCacheCleanerTask</value>
+      </property>
+      <property>
+        <name>datanucleus.autoCreateSchema</name>
+        <value>false</value>
+      </property>
+      <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://hive-metastore-svc.hive.svc.cluster.local:9083</value>
+      </property>
+      <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>file:///tmp/</value>
+      </property>
+    </configuration>
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hive-initschema
+  namespace: hive
+spec:
+  template:
+    spec:
+      containers:
+        - name: hivemeta
+          image: kubernetesbigdataeg/hive-metastore:3.0.0-1
+          command: ["/opt/hive-metastore/bin/schematool"]
+          args: ["--verbose" ,"-initSchema" , "-dbType", "postgres" , "-userName", "postgres",
+                 "-passWord", "postgres" , "-url", "jdbc:postgresql://postgresql-svc.hive.svc.cluster.local:5432/metastore"]
+      restartPolicy: Never
+  backoffLimit: 4
