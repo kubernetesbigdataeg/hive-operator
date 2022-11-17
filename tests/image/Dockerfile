@@ -5,13 +5,9 @@ ARG HADOOP_VERSION=3.2.0
 
 RUN apt-get update && \
     apt-get install -y curl --no-install-recommends && \
+    apt-get install -y wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Install Gomplate
-RUN curl -sfSL https://github.com/hairyhenderson/gomplate/releases/download/v3.6.0/gomplate_linux-amd64 \
-      -o /usr/local/bin/gomplate \
-    && chmod 755 /usr/local/bin/gomplate
 
 ENV HADOOP_HOME="/opt/hadoop"
 ENV METASTORE_HOME="/opt/hive-metastore"
@@ -43,8 +39,11 @@ RUN curl -s https://jdbc.postgresql.org/download/postgresql-42.2.16.jar -o postg
 RUN cp /opt/postgresql-jdbc.jar  ${HADOOP_HOME}/share/hadoop/common/lib/ && chmod -R 775 ${HADOOP_HOME}/share/hadoop/common/lib/*
 RUN cp /opt/postgresql-jdbc.jar ${METASTORE_HOME}/lib/ && chmod -R 775 ${METASTORE_HOME}/lib/*
 
+RUN wget https://github.com/kubernetesbigdataeg/propgen/releases/latest/download/propgen
+
 COPY entrypoint.sh ${METASTORE_HOME}/bin/
-RUN chmod 775 ${METASTORE_HOME}/bin/entrypoint.sh
+RUN chmod 775 ${METASTORE_HOME}/bin/entrypoint.sh && \
+    chmod 777 propgen
 
 # Metastore URI Port
 EXPOSE 9083
