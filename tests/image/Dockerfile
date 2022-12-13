@@ -34,6 +34,16 @@ RUN curl -s http://apache.uvigo.es/hive/hive-standalone-metastore-3.0.0/hive-sta
 RUN cp ${HADOOP_HOME}/share/hadoop/tools/lib/hadoop-aws* ${METASTORE_HOME}/lib/ && \
     cp ${HADOOP_HOME}/share/hadoop/tools/lib/aws-java-sdk* ${METASTORE_HOME}/lib/
 
+COPY hms-plugin.jar ${METASTORE_HOME}/lib/
+
+RUN wget https://repo1.maven.org/maven2/org/apache/hive/hcatalog/hive-hcatalog-server-extensions/3.0.0/hive-hcatalog-server-extensions-3.0.0.jar \
+  && mv hive-hcatalog-server-extensions-3.0.0.jar ${METASTORE_HOME}/lib/
+
+RUN wget https://repo1.maven.org/maven2/org/apache/kudu/kudu-hive/1.16.0/kudu-hive-1.16.0.jar \
+  && mv kudu-hive-1.16.0.jar ${METASTORE_HOME}/lib/
+
+RUN ls ${METASTORE_HOME}/lib/
+
 # Download and install the postgres connector used by HiveMetastore
 RUN curl -s https://jdbc.postgresql.org/download/postgresql-42.2.16.jar -o postgresql-42.2.16.jar && mv postgresql-42.2.16.jar /opt/postgresql-jdbc.jar
 RUN cp /opt/postgresql-jdbc.jar  ${HADOOP_HOME}/share/hadoop/common/lib/ && chmod -R 775 ${HADOOP_HOME}/share/hadoop/common/lib/*
