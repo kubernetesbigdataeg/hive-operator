@@ -79,7 +79,11 @@ data:
     export HIVE__metastoresite__metastore_task_threads_always="org.apache.hadoop.hive.metastore.events.EventCleanerTask,org.apache.hadoop.hive.metastore.MaterializationsCacheCleanerTask"
     export HIVE__metastoresite__datanucleus_autoCreateSchema="false"
     export HIVE__metastoresite__hive_metastore_uris="thrift://hive-metastore-svc.hive.svc.cluster.local:9083"
-    export HIVE__metastoresite__hive_metastore_warehouse_dir="file:///tmp/"
+    export HIVE__metastoresite__hive_metastore_warehouse_dir="/var/lib/hive/warehouse"
+    export HIVE__metastoresite__hive_metastore_transactional_event_listeners="org.apache.hive.hcatalog.listener.DbNotificationListener,org.apache.kudu.hive.metastore.KuduMetastorePlugin"
+    export HIVE__metastoresite__hive_metastore_disallow_incompatible_col_type_changes="false"
+    export HIVE__metastoresite__hive_metastore_dml_events="true"
+    export HIVE__metastoresite__hive_metastore_event_db_notification_api_auth="false"
 ---
 apiVersion: batch/v1
 kind: Job
