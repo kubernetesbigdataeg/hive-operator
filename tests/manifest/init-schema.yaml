@@ -8,8 +8,8 @@ spec:
     spec:
       containers:
         - name: hivemeta
-          image: kubernetesbigdataeg/hive-metastore:3.1.2-1
-          imagePullPolicy: Always
+          image: kubernetesbigdataeg/hive:3.1.3-1
+          imagePullPolicy: IfNotPresent
           command: ["/opt/hive/bin/schematool"]
           args: ["--verbose" ,"-initSchema" , "-dbType", "postgres" , "-userName", "postgres",
                  "-passWord", "postgres" , "-url", "jdbc:postgresql://postgresql-svc.kudu.svc.cluster.local:5432/metastore"]

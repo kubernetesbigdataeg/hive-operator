@@ -1,3 +1,3 @@
-podman build . --tag docker.io/kubernetesbigdataeg/hive-metastore:3.1.2-1
-podman login docker.io
-podman push docker.io/kubernetesbigdataeg/hive-metastore:3.1.2-1
+podman build . --tag docker.io/kubernetesbigdataeg/hive:3.1.3-1
+podman login docker.io -u kubernetesbigdataeg
+podman push docker.io/kubernetesbigdataeg/hive:3.1.3-1
