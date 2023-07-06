@@ -1,10 +1,24 @@
 apiVersion: bigdata.kubernetesbigdataeg.org/v1alpha1
 kind: Hive
 metadata:
-  name: hive-sample
-spec:
-  # TODO(user): edit the following value to ensure the number 
-  # of Pods/Instances your Operand must have on cluster        
-  size: 1
-
-  
+  name: hive
+spec:      
+  size: 1 
+  baseImageVersion: "3.1.3-1"
+  hiveMetastoreUris: "thrift://hive-svc.default.svc.cluster.local:9083"
+# TODO: add connectors to hive image
+  dbConnection: 
+    userName: "postgres"
+    passWord: "postgres"
+    url: "jdbc:postgresql://postgres-svc.default.svc.cluster.local:5432/metastore"
+  deployment:
+# TODO: comprobar si son necesarias estas variables
+    envVar:
+      HIVE_DB_NAME: "metastore"   
+    resources:
+      requests:
+        cpu: "1"
+        memory: 1Gi
+  service:
+    thriftPort: 9083
+    hiveServerPort: 10000

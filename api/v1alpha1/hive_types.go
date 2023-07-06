@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,7 +35,12 @@ type HiveSpec struct {
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=3
 	// +kubebuilder:validation:ExclusiveMaximum=false
-	Size int32 `json:"size,omitempty"`
+	Size              int32          `json:"size"`
+	BaseImageVersion  string         `json:"baseImageVersion,omitempty"`
+	HiveMetastoreUris string         `json:"hiveMetastoreUris"`
+	Service           ServiceSpec    `json:"service,omitempty"`
+	Deployment        DeploymentSpec `json:"deployment"`
+	DbConnection      DbConnection   `json:"dbConnection"`
 }
 
 // HiveStatus defines the observed state of Hive
@@ -49,6 +55,35 @@ type HiveStatus struct {
 	// For further information see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 
 	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+}
+
+type DeploymentSpec struct {
+	EnvVar    EnvVar                      `json:"envVar"`
+	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
+}
+
+type EnvVar struct {
+	//HIVE_DB_EXTERNAL string `json:"HIVE_DB_EXTERNAL,omitempty"`
+	HIVE_DB_NAME string `json:"HIVE_DB_NAME"`
+}
+
+type Resources struct {
+	MemoryRequest string `json:"memoryRequest,omitempty"`
+	CpuRequest    string `json:"cpuRequest,omitempty"`
+	MemoryLimit   string `json:"memoryLimit,omitempty"`
+	Cpulimit      string `json:"cpulimit,omitempty"`
+}
+
+type ServiceSpec struct {
+	ThriftPort     int32 `json:"thriftPort,omitempty"`
+	HiveServerPort int32 `json:"hiveServerPort,omitempty"`
+}
+
+type DbConnection struct {
+	//DbType   string `json:"dbType,omitempty"`
+	UserName string `json:"userName"`
+	PassWord string `json:"passWord"`
+	Url      string `json:"url"`
 }
 
 //+kubebuilder:object:root=true
