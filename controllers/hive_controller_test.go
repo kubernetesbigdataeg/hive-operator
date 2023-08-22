@@ -27,6 +27,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -83,7 +84,29 @@ var _ = Describe("Hive controller", func() {
 						Namespace: namespace.Name,
 					},
 					Spec: bigdatav1alpha1.HiveSpec{
-						Size: 1,
+						Size:              1,
+						BaseImageVersion:  "3.1.3-1",
+						HiveMetastoreUris: "thrift://hive-svc.default.svc.cluster.local:9083",
+						DbConnection: bigdatav1alpha1.DbConnection{
+							UserName: "postgres",
+							PassWord: "postgres",
+							Url:      "jdbc:postgresql://postgres-svc.default.svc.cluster.local:5432/metastore",
+						},
+						Deployment: bigdatav1alpha1.DeploymentSpec{
+							EnvVar: bigdatav1alpha1.EnvVar{
+								HIVE_DB_NAME: "metastore",
+							},
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    resource.MustParse("1"),
+									corev1.ResourceMemory: resource.MustParse("1Gi"),
+								},
+							},
+						},
+						Service: bigdatav1alpha1.ServiceSpec{
+							ThriftPort:     9083,
+							HiveServerPort: 10000,
+						},
 					},
 				}
 

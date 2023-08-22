@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: docker.io/kubernetesbigdataeg/hive-operator
-  newTag: 0.0.1
+  newTag: 0.0.2
