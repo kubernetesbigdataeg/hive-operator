@@ -10,7 +10,7 @@ spec:
   dbConnection: 
     userName: "postgres"
     passWord: "postgres"
-    url: "jdbc:postgresql://postgres-svc.default.svc.cluster.local:5432/metastore"
+    url: "jdbc:postgresql://postgresql-svc.default.svc.cluster.local:5432/metastore"
   deployment:
 # TODO: comprobar si son necesarias estas variables
     envVar:

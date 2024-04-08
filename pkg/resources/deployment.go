@@ -178,7 +178,7 @@ func ReconcileDeployment(ctx context.Context, client runtimeClient.Client, desir
 		}
 	}
 
-	// TODO: comprobar si ha cambiado en campos mas especificos.
+	// TODO: Check if it has changed in more specific fields.
 	// Check if the current Deployment matches the desired one
 	if !reflect.DeepEqual(current.Spec, desired.Spec) {
 		// If it doesn't match, we'll update the current Deployment to match the desired one
