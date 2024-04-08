@@ -90,7 +90,7 @@ var _ = Describe("Hive controller", func() {
 						DbConnection: bigdatav1alpha1.DbConnection{
 							UserName: "postgres",
 							PassWord: "postgres",
-							Url:      "jdbc:postgresql://postgres-svc.default.svc.cluster.local:5432/metastore",
+							Url:      "jdbc:postgresql://postgresql-svc.default.svc.cluster.local:5432/metastore",
 						},
 						Deployment: bigdatav1alpha1.DeploymentSpec{
 							EnvVar: bigdatav1alpha1.EnvVar{

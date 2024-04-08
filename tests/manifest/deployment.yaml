@@ -2,7 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hive-svc
-  namespace: kudu
 spec:
   type: ClusterIP
   ports:
@@ -21,7 +20,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hive
-  namespace: kudu
 spec:
   selector:
     matchLabels:
@@ -70,17 +68,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: hive-conf
-  namespace: kudu
 data:
   hive.env: |
-    export HIVE__hivesite__javax_jdo_option_ConnectionURL="jdbc:postgresql://postgresql-svc.kudu.svc.cluster.local:5432/metastore"
+    export HIVE__hivesite__javax_jdo_option_ConnectionURL="jdbc:postgresql://postgresql-svc.default.svc.cluster.local:5432/metastore"
     export HIVE__hivesite__javax_jdo_option_ConnectionDriverName="org.postgresql.Driver"
     export HIVE__hivesite__javax_jdo_option_ConnectionUserName="postgres"
     export HIVE__hivesite__javax_jdo_option_ConnectionPassword="postgres"
     export HIVE__hivesite__metastore_expression_proxy="org.apache.hadoop.hive.metastore.DefaultPartitionExpressionProxy"
     export HIVE__hivesite__metastore_task_threads_always="org.apache.hadoop.hive.metastore.events.EventCleanerTask,org.apache.hadoop.hive.metastore.MaterializationsCacheCleanerTask"
     export HIVE__hivesite__datanucleus_autoCreateSchema="false"
-    export HIVE__hivesite__hive_metastore_uris="thrift://hive-svc.kudu.svc.cluster.local:9083"
+    export HIVE__hivesite__hive_metastore_uris="thrift://hive-svc.default.svc.cluster.local:9083"
     export HIVE__hivesite__hive_metastore_warehouse_dir="/var/lib/hive/warehouse"
     export HIVE__hivesite__hive_metastore_transactional_event_listeners="org.apache.hive.hcatalog.listener.DbNotificationListener,org.apache.kudu.hive.metastore.KuduMetastorePlugin"
     export HIVE__hivesite__hive_metastore_disallow_incompatible_col_type_changes="false"
